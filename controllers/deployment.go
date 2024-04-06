@@ -2,18 +2,26 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
 )
 
-func getDeploymentItems(clientset *kubernetes.Clientset, namespaces []string) ([]ControllerItem, error) {
+func getDeploymentItems(clientset *kubernetes.Clientset, namespaces []string, debugInfo bool) ([]ControllerItem, error) {
 	var result []ControllerItem
 	for _, namespace := range namespaces {
 		controllerClient := clientset.AppsV1().Deployments(namespace)
 		controllers, err := controllerClient.List(context.TODO(), metav1.ListOptions{})
 		if err != nil {
 			return nil, nil
+		}
+		if debugInfo {
+			if controllerJson, err := json.Marshal(controllers); err != nil {
+				return nil, nil
+			} else {
+				klog.Infof("namespaces %s statefulset:\n%s", namespace, controllerJson)
+			}
 		}
 		for _, controller := range controllers.Items {
 			controllerItem := ControllerItem{

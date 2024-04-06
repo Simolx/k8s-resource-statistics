@@ -4,6 +4,7 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"errors"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
@@ -94,8 +95,9 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	err := viper.ReadInConfig()
-	cobra.CheckErr(err)
+	if err := viper.ReadInConfig(); err != nil && !errors.As(err, &viper.ConfigFileNotFoundError{}) {
+		cobra.CheckErr(err)
+	}
 	kubeConfigFlag := rootCmd.PersistentFlags().Lookup(KUBECONFIGKEY)
 	if fileInfo, err := os.Stat(kubeConfigFlag.Value.String()); err == nil && !fileInfo.IsDir() {
 		viper.BindPFlag(KUBECONFIGKEY, kubeConfigFlag)

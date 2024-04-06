@@ -15,6 +15,7 @@ import (
 
 var requestNamespaces []string
 var jsonFile, csvFile, excelFile string
+var debugInfo bool
 
 var resourceCmd = &cobra.Command{
 	Use:   "resource",
@@ -30,7 +31,7 @@ var resourceCmd = &cobra.Command{
 			cobra.CheckErr(err)
 		}
 		klog.Infof("requests namespace %#v", namespaces)
-		result, err := controllers.GetControllerItems(clientset, namespaces)
+		result, err := controllers.GetControllerItems(clientset, namespaces, debugInfo)
 		cobra.CheckErr(err)
 		if len(jsonFile) > 0 {
 			cobra.CheckErr(
@@ -61,6 +62,8 @@ func init() {
 	resourceCmd.Flags().StringVar(&csvFile, "csv", "", "csv file path for result")
 
 	resourceCmd.Flags().StringVar(&excelFile, "excel", "", "excel file path for result")
+
+	resourceCmd.Flags().BoolVar(&debugInfo, "debug", false, "show debug info")
 
 	// Here you will define your flags and configuration settings.
 

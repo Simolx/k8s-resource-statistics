@@ -121,19 +121,19 @@ func GetNamespaces(clientset *kubernetes.Clientset) ([]string, error) {
 	}
 }
 
-func GetControllerItems(clientset *kubernetes.Clientset, namespaces []string) ([]ControllerItem, error) {
+func GetControllerItems(clientset *kubernetes.Clientset, namespaces []string, debugInfo bool) ([]ControllerItem, error) {
 	var result []ControllerItem
-	if deployments, err := getDeploymentItems(clientset, namespaces); err != nil {
+	if deployments, err := getDeploymentItems(clientset, namespaces, debugInfo); err != nil {
 		return result, err
 	} else {
 		result = append(result, deployments...)
 	}
-	if statefulsets, err := getStatefulsetItems(clientset, namespaces); err != nil {
+	if statefulsets, err := getStatefulsetItems(clientset, namespaces, debugInfo); err != nil {
 		return result, err
 	} else {
 		result = append(result, statefulsets...)
 	}
-	if daemonsets, err := getDaemonsetItems(clientset, namespaces); err != nil {
+	if daemonsets, err := getDaemonsetItems(clientset, namespaces, debugInfo); err != nil {
 		return result, err
 	} else {
 		result = append(result, daemonsets...)
